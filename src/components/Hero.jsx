@@ -1,4 +1,4 @@
-import Spline from '@splinetool/react-spline'
+import NeonLedgerGraphic from './NeonLedgerGraphic'
 
 export default function Hero() {
   const scrollTo = (id) => {
@@ -8,7 +8,7 @@ export default function Hero() {
 
   return (
     <section id="top" className="relative pt-28">
-      <div className="absolute inset-0 opacity-60">
+      <div className="absolute inset-0 opacity-60" aria-hidden="true">
         <div className="absolute inset-0 bg-[radial-gradient(600px_circle_at_20%_20%,rgba(16,185,129,0.25),transparent)]"/>
         <div className="absolute inset-0 bg-[radial-gradient(600px_circle_at_80%_20%,rgba(34,197,94,0.2),transparent)]"/>
       </div>
@@ -32,7 +32,7 @@ export default function Hero() {
         </div>
         <div className="relative h-[420px] sm:h-[520px] lg:h-[560px]">
           <div className="absolute inset-0 rounded-2xl overflow-hidden border border-white/10 bg-slate-900/40 backdrop-blur-xl">
-            <Spline scene="https://prod.spline.design/41MGRk-UDPKO-l6W/scene.splinecode" style={{ width: '100%', height: '100%' }} />
+            <NeonLedgerGraphic />
           </div>
           <div className="absolute -inset-1 rounded-2xl bg-gradient-to-tr from-emerald-500/20 via-transparent to-transparent blur-xl pointer-events-none"/>
         </div>
