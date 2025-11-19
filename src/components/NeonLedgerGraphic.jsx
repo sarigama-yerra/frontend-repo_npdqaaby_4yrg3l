@@ -243,12 +243,23 @@ export default function NeonLedgerGraphic() {
 
         {/* Blockchain chain links along the bottom */}
         <g transform="translate(120 700)" filter="url(#glow)">
+          {/* Knight Rider style emerald scanner */}
+          {!prefersReduced && (
+            <motion.rect x="-60" y="-30" width="120" height="60" rx="30" fill={emerald} opacity="0.12"
+              animate={{ x: [-60, 900, -60] }} transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }} />
+          )}
           {Array.from({ length: 10 }).map((_, i) => (
             <g key={i} transform={`translate(${i * 100} 0)`}>
-              <motion.rect x="0" y="-20" width="80" height="40" rx="10" fill="#0b1324" stroke="url(#duo)" strokeOpacity="0.5"
+              {/* Base link */}
+              <motion.rect x="0" y="-20" width="80" height="40" rx="10" fill="#071b16" stroke={emerald} strokeOpacity="0.75" strokeWidth="2"
                 initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 + i * 0.04, duration: 0.28 }} />
-              <motion.line x1="80" y1="0" x2="100" y2="0" stroke="url(#duo)" strokeWidth="2" strokeDasharray="6 10"
-                animate={prefersReduced ? {} : { strokeDashoffset: [0, -16] }} transition={{ duration: 1.2, repeat: prefersReduced ? 0 : Infinity, ease: 'linear' }} />
+              {/* Inner glow that ripples left→right→left */}
+              <motion.rect x="6" y="-14" width="68" height="28" rx="8" fill={emerald} opacity={0.18}
+                animate={prefersReduced ? {} : { opacity: [0.18, 0.9, 0.18] }}
+                transition={{ duration: 1.3, delay: i * 0.08, repeat: prefersReduced ? 0 : Infinity, repeatType: 'mirror', ease: 'easeInOut' }} />
+              {/* Connector dash */}
+              <motion.line x1="80" y1="0" x2="100" y2="0" stroke={emerald} strokeWidth="2" strokeDasharray="6 10"
+                animate={prefersReduced ? {} : { strokeDashoffset: [0, -16, 0] }} transition={{ duration: 1.2, repeat: prefersReduced ? 0 : Infinity, ease: 'linear' }} />
             </g>
           ))}
         </g>
