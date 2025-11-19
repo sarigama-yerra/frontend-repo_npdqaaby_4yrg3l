@@ -1,27 +1,52 @@
-import { motion } from 'framer-motion'
+import React, { useState } from 'react'
+import { motion, useReducedMotion } from 'framer-motion'
 
 // Fintech + cybersecurity visual narrative (high-energy, passive loop):
 // ISSUE → SEAL → VERIFY with arrows, matrix-rain hashes, emerald + ice-blue accents.
+// Enhancements: captions, live console ticker, subtle parallax on background only,
+// clickable BVL PROTOCOL chip that scrolls to How It Works, brighter VERIFIED pulse.
 
 export default function NeonLedgerGraphic() {
   const emerald = '#10b981'
   const ice = '#7dd3fc' // ice-blue accent
+  const prefersReduced = useReducedMotion()
+
+  // Parallax offsets (very subtle). Background layers read these.
+  const [px, setPx] = useState(0)
+  const [py, setPy] = useState(0)
+  const parallax = (e) => {
+    if (prefersReduced) return
+    const rect = e.currentTarget.getBoundingClientRect()
+    const x = (e.clientX - rect.left) / rect.width // 0..1
+    const y = (e.clientY - rect.top) / rect.height
+    setPx((x - 0.5) * 8) // max ~4px offset either side
+    setPy((y - 0.5) * 8)
+  }
 
   // Helper: build a short stream of hex for matrix rain
   const hex = '0123456789abcdef'
   const makeStream = (len) => Array.from({ length: len }).map(() => hex[Math.floor(Math.random() * hex.length)])
 
+  const scrollToHow = () => {
+    const el = document.querySelector('#how')
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
   return (
-    <div className="relative h-full w-full">
-      {/* Top-left protocol label */}
-      <div className="absolute left-4 top-4 z-20 select-none">
-        <div className="px-3 py-1 rounded-full text-xs tracking-widest font-semibold text-emerald-300/90 bg-emerald-500/10 border border-emerald-400/20 backdrop-blur-sm">
-          BVL PROTOCOL
-        </div>
-      </div>
+    <div className="relative h-full w-full" onMouseMove={parallax}>
+      {/* Top-left protocol label (clickable) */}
+      <button
+        type="button"
+        onClick={scrollToHow}
+        className="absolute left-4 top-4 z-20 select-none cursor-pointer px-3 py-1 rounded-full text-xs tracking-widest font-semibold text-emerald-300/90 bg-emerald-500/10 border border-emerald-400/20 backdrop-blur-sm flex items-center gap-1.5 hover:shadow-[0_0_0_6px_rgba(125,211,252,0.1)] hover:border-emerald-400/50 transition"
+        aria-label="Open BVL Protocol details"
+      >
+        BVL PROTOCOL
+        <span className="text-emerald-200/90">›</span>
+      </button>
 
       {/* Backdrop glows */}
-      <div className="absolute -inset-10 pointer-events-none">
+      <div className="absolute -inset-10 pointer-events-none" style={{ transform: `translate3d(${px * 0.2}px, ${py * 0.2}px, 0)` }}>
         <div className="absolute inset-0 bg-[radial-gradient(800px_circle_at_15%_25%,rgba(16,185,129,0.28),transparent)]"/>
         <div className="absolute inset-0 bg-[radial-gradient(900px_circle_at_85%_25%,rgba(125,211,252,0.20),transparent)]"/>
         <div className="absolute inset-0 bg-[conic-gradient(from_180deg_at_50%_50%,rgba(16,185,129,0.07),transparent,rgba(125,211,252,0.07),transparent)]"/>
@@ -29,7 +54,7 @@ export default function NeonLedgerGraphic() {
 
       <svg viewBox="0 0 1200 800" className="h-full w-full">
         <title>BVL Issuance → Seal → QR Verification</title>
-        <desc>High-energy animated scene with document issuance, sealing, QR verification, directional arrows, matrix rain, and cryptographic vibes.</desc>
+        <desc>High-energy animated scene with document issuance, sealing, QR verification, directional arrows, matrix rain, captions and a live console.</desc>
         <defs>
           <filter id="glow">
             <feGaussianBlur stdDeviation="3" result="b"/>
@@ -70,20 +95,23 @@ export default function NeonLedgerGraphic() {
         </defs>
 
         {/* Subtle cyber grid */}
-        <g opacity="0.16">
+        <motion.g opacity="0.16" style={{ transform: `translate(${px * 0.4}px, ${py * 0.4}px)` }}>
           {Array.from({ length: 18 }).map((_, i) => (
             <line key={`v-${i}`} x1={40 + i * 64} y1={40} x2={40 + i * 64} y2={760} stroke="url(#duo)" strokeOpacity="0.1" />
           ))}
           {Array.from({ length: 12 }).map((_, i) => (
             <line key={`h-${i}`} x1={40} y1={60 + i * 60} x2={1160} y2={60 + i * 60} stroke="url(#duo)" strokeOpacity="0.1" />
           ))}
-        </g>
+        </motion.g>
 
-        {/* Section labels (caps, larger) */}
-        <g fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace" fontSize="22" fontWeight="700">
-          <text x="170" y="160" fill={ice} opacity="0.9">ISSUE</text>
-          <text x="520" y="160" fill={emerald} opacity="0.95">SEAL</text>
-          <text x="870" y="160" fill={ice} opacity="0.9">VERIFY</text>
+        {/* Section labels (caps, larger) + captions */}
+        <g fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace" fontWeight="700">
+          <text x="170" y="160" fontSize="22" fill={ice} opacity="0.9">ISSUE</text>
+          <text x="170" y="182" fontSize="12" fill="#9ca3af" opacity="0.9">Document created & fingerprinted (SHA-256)</text>
+          <text x="520" y="160" fontSize="22" fill={emerald} opacity="0.95">SEAL</text>
+          <text x="520" y="182" fontSize="12" fill="#9ca3af" opacity="0.9">BVL stamp & security ribbon applied</text>
+          <text x="870" y="160" fontSize="22" fill={ice} opacity="0.9">VERIFY</text>
+          <text x="870" y="182" fontSize="12" fill="#9ca3af" opacity="0.9">QR scanned, hash and fields match</text>
         </g>
 
         {/* Direction arrows between stages */}
@@ -183,29 +211,35 @@ export default function NeonLedgerGraphic() {
           <motion.rect x="76" y="96" width="168" height="20" fill="url(#scan)"
             animate={{ y: [96, 244, 96] }} transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut', delay: 0.6 }} />
 
-          {/* Verified TRUE badge with tick */}
-          <motion.g initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 1.4, duration: 0.35 }}>
-            <rect x="98" y="36" width="160" height="30" rx="15" fill="#052e26" stroke={emerald} strokeOpacity="0.6" />
-            <path d="M118 51 l8 8 l16 -16" fill="none" stroke={emerald} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
-            <text x="180" y="58" textAnchor="middle" fontFamily="ui-monospace, Menlo, monospace" fontSize="14" fill="#a7f3d0">VERIFIED: TRUE</text>
+          {/* Verified TRUE badge with tick + lock + pulse ring */}
+          <motion.g initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 1.4, duration: 0.35 }}>
+            <motion.circle cx="178" cy="51" r="20" fill="none" stroke={emerald} strokeOpacity="0.8" filter="url(#glow)"
+              animate={{ r: [18, 22, 18], opacity: [0.5, 0.9, 0.6] }} transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut', delay: 1.6 }} />
+            <rect x="98" y="36" width="178" height="30" rx="15" fill="#052e26" stroke={emerald} strokeOpacity="0.8" />
+            {/* tiny lock */}
+            <path d="M120 52 v8 h12 v-8 h-2 v-3 a4 4 0 0 0 -8 0 v3 z" fill={ice} opacity="0.9"/>
+            {/* check */}
+            <path d="M142 57 l6 6 l12 -12" fill="none" stroke={emerald} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+            <text x="190" y="58" textAnchor="middle" fontFamily="ui-monospace, Menlo, monospace" fontSize="14" fill="#a7f3d0">VERIFIED: TRUE</text>
           </motion.g>
         </g>
 
         {/* MATRIX RAIN (background, ice + emerald) */}
-        <g opacity="0.35" fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace" filter="url(#glow)">
+        <motion.g opacity="0.35" fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace" filter="url(#glow)" style={{ transform: `translate(${px * 0.6}px, ${py * 0.6}px)` }}>
           {Array.from({ length: 18 }).map((_, col) => {
             const x = 80 + col * 60
             const stream = makeStream(16)
+            const d = prefersReduced ? 0 : (3 + (col % 4) * 0.4)
             return (
               <motion.g key={col} transform={`translate(${x} -40)`}
-                animate={{ y: [ -80, 820 ] }} transition={{ duration: 3 + (col % 4) * 0.4, repeat: Infinity, ease: 'linear', delay: (col % 6) * 0.15 }}>
+                animate={prefersReduced ? {} : { y: [ -80, 820 ] }} transition={{ duration: d || 1, repeat: prefersReduced ? 0 : Infinity, ease: 'linear', delay: (col % 6) * 0.15 }}>
                 {stream.map((ch, i) => (
                   <text key={i} x={0} y={i * 22} fontSize="14" fill={i % 2 === 0 ? ice : emerald} opacity={i === stream.length - 1 ? 0.9 : 0.7}>{ch}</text>
                 ))}
               </motion.g>
             )
           })}
-        </g>
+        </motion.g>
 
         {/* Blockchain chain links along the bottom */}
         <g transform="translate(120 700)" filter="url(#glow)">
@@ -214,27 +248,48 @@ export default function NeonLedgerGraphic() {
               <motion.rect x="0" y="-20" width="80" height="40" rx="10" fill="#0b1324" stroke="url(#duo)" strokeOpacity="0.5"
                 initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 + i * 0.04, duration: 0.28 }} />
               <motion.line x1="80" y1="0" x2="100" y2="0" stroke="url(#duo)" strokeWidth="2" strokeDasharray="6 10"
-                animate={{ strokeDashoffset: [0, -16] }} transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }} />
+                animate={prefersReduced ? {} : { strokeDashoffset: [0, -16] }} transition={{ duration: 1.2, repeat: prefersReduced ? 0 : Infinity, ease: 'linear' }} />
             </g>
           ))}
         </g>
 
-        {/* Floating verification nodes */}
-        {[
-          { cx: 300, cy: 520 }, { cx: 540, cy: 300 }, { cx: 780, cy: 520 }, { cx: 1040, cy: 420 }
-        ].map((n, i) => (
-          <g key={i}>
-            <circle cx={n.cx} cy={n.cy} r="12" fill="url(#emerald)" opacity="0.25" />
-            <motion.circle cx={n.cx} cy={n.cy} r="10" fill={emerald} filter="url(#glow)"
-              animate={{ r: [8.5, 12, 8.5], opacity: [0.6, 1, 0.6] }} transition={{ duration: 1.6, delay: i * 0.15, repeat: Infinity, ease: 'easeInOut' }} />
-            <motion.circle cx={n.cx} cy={n.cy} r="24" fill="url(#nodeGlow)" opacity="0.75"
-              animate={{ r: [20, 26, 20], opacity: [0.55, 0.9, 0.55] }} transition={{ duration: 2.0, delay: i * 0.18, repeat: Infinity, ease: 'easeInOut' }} />
-          </g>
-        ))}
+        {/* Floating verification nodes (parallax slightly) */}
+        <motion.g style={{ transform: `translate(${px * 0.3}px, ${py * 0.3}px)` }}>
+          {[
+            { cx: 300, cy: 520 }, { cx: 540, cy: 300 }, { cx: 780, cy: 520 }, { cx: 1040, cy: 420 }
+          ].map((n, i) => (
+            <g key={i}>
+              <circle cx={n.cx} cy={n.cy} r="12" fill="url(#emerald)" opacity="0.25" />
+              <motion.circle cx={n.cx} cy={n.cy} r="10" fill={emerald} filter="url(#glow)"
+                animate={prefersReduced ? {} : { r: [8.5, 12, 8.5], opacity: [0.6, 1, 0.6] }} transition={{ duration: 1.6, delay: i * 0.15, repeat: prefersReduced ? 0 : Infinity, ease: 'easeInOut' }} />
+              <motion.circle cx={n.cx} cy={n.cy} r="24" fill="url(#nodeGlow)" opacity="0.75"
+                animate={prefersReduced ? {} : { r: [20, 26, 20], opacity: [0.55, 0.9, 0.55] }} transition={{ duration: 2.0, delay: i * 0.18, repeat: prefersReduced ? 0 : Infinity, ease: 'easeInOut' }} />
+            </g>
+          ))}
+        </motion.g>
+
+        {/* Live console bar (bottom) */}
+        <g transform="translate(80 760)">
+          <rect x="0" y="-28" width="1040" height="24" rx="8" fill="#0b1324" stroke={ice} strokeOpacity="0.2" />
+          <motion.g initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}>
+            <motion.text x="16" y="-11" fontFamily="ui-monospace, Menlo, monospace" fontSize="12" fill="#a7f3d0"
+              animate={{ opacity: [1, 0, 0, 1], x: [16, 0, 0, 16] }} transition={{ duration: 8, repeat: Infinity, times: [0, 0.32, 0.34, 0.66], ease: 'easeInOut' }}>
+              CERT BVL-POF-2026-000123 • STATUS: VERIFIED TRUE
+            </motion.text>
+            <motion.text x="16" y="-11" fontFamily="ui-monospace, Menlo, monospace" fontSize="12" fill="#93c5fd"
+              animate={{ opacity: [0, 1, 0, 0] }} transition={{ duration: 8, repeat: Infinity, times: [0.33, 0.66, 0.67, 1], ease: 'easeInOut' }}>
+              HASH MATCH • INTEGRITY: OK • TIMESTAMP: 2026-03-01T10:22:11Z
+            </motion.text>
+            <motion.text x="16" y="-11" fontFamily="ui-monospace, Menlo, monospace" fontSize="12" fill="#86efac"
+              animate={{ opacity: [0, 0, 1, 0] }} transition={{ duration: 8, repeat: Infinity, times: [0.66, 0.67, 1, 1], ease: 'easeInOut' }}>
+              LEDGER EVENT • ISSUER: BANK NODE-07 • REGION: EU
+            </motion.text>
+          </motion.g>
+        </g>
       </svg>
 
       {/* Ambient particles */}
-      {[...Array(22)].map((_, i) => (
+      {!prefersReduced && [...Array(22)].map((_, i) => (
         <motion.span
           key={i}
           className="absolute h-[2px] w-[2px] rounded-full bg-emerald-300/80"

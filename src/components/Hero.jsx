@@ -1,3 +1,5 @@
+import { motion } from 'framer-motion'
+import { Shield, Lock } from 'lucide-react'
 import NeonLedgerGraphic from './NeonLedgerGraphic'
 
 export default function Hero() {
@@ -6,11 +8,30 @@ export default function Hero() {
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
+  const badges = [
+    { label: 'ISO/IEC 27001–aligned', hint: 'Information Security Management', icon: Shield },
+    { label: 'SOC 2–ready', hint: 'Security, availability, confidentiality', icon: Shield },
+    { label: 'GDPR by design', hint: 'Data protection in the EU', icon: Lock },
+    { label: 'PSD2 / Open Banking aware', hint: 'Secure API and consent standards', icon: Shield },
+    { label: 'eIDAS trust-services friendly', hint: 'Electronic identification and trust', icon: Shield },
+    { label: 'AML / KYC controls support', hint: 'Anti-money laundering & identity', icon: Lock }
+  ]
+
+  const container = {
+    hidden: { opacity: 0 },
+    show: { opacity: 1, transition: { staggerChildren: 0.08 } }
+  }
+
+  const item = {
+    hidden: { opacity: 0, y: 8 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.35, ease: 'easeOut' } }
+  }
+
   return (
     <section id="top" className="relative pt-28">
       <div className="absolute inset-0 opacity-60" aria-hidden="true">
         <div className="absolute inset-0 bg-[radial-gradient(600px_circle_at_20%_20%,rgba(16,185,129,0.25),transparent)]"/>
-        <div className="absolute inset-0 bg-[radial-gradient(600px_circle_at_80%_20%,rgba(34,197,94,0.2),transparent)]"/>
+        <div className="absolute inset-0 bg-[radial-gradient(600px_circle_at_80%_20%,rgba(125,211,252,0.20),transparent)]"/>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-10 items-center">
@@ -38,15 +59,42 @@ export default function Hero() {
         </div>
       </div>
 
-      <div className="mt-14 text-center">
-        <p className="text-slate-400 text-sm uppercase tracking-widest">Built for forward-thinking banks, fintechs and legal teams.</p>
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-6 opacity-70">
-          {[1,2,3,4,5,6].map((i)=>(
-            <div key={i} className="h-10 w-36 rounded-md border border-white/10 bg-white/5 grid place-items-center text-slate-500 text-xs">
-              Logo placeholder – Bank / Fintech
-            </div>
-          ))}
+      {/* Security & Compliance badges */}
+      <div className="mt-16">
+        <div className="text-center">
+          <h2 className="text-white text-lg font-semibold tracking-wide">Security & Compliance Ready</h2>
+          <p className="mt-2 text-slate-400 text-sm max-w-3xl mx-auto">
+            Designed to support modern information security, data protection, and financial compliance frameworks.
+          </p>
         </div>
+
+        <motion.div
+          className="mt-6 max-w-5xl mx-auto flex flex-wrap items-center justify-center gap-3"
+          variants={container}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.3 }}
+        >
+          {badges.map((b, i) => {
+            const Icon = b.icon
+            return (
+              <motion.div
+                key={b.label}
+                variants={item}
+                className="group relative select-none cursor-default"
+              >
+                <div className="flex items-center gap-2 px-3 py-2 rounded-full bg-white/5 backdrop-blur-md border border-emerald-400/30 text-slate-200 text-xs shadow-[inset_0_0_0_1px_rgba(125,211,252,0.06)] transition-all hover:-translate-y-0.5 hover:border-emerald-400/60 hover:shadow-[0_0_0_3px_rgba(125,211,252,0.12),inset_0_0_0_1px_rgba(125,211,252,0.1)]">
+                  <Icon className="h-3.5 w-3.5 text-emerald-300" />
+                  <span className="font-medium tracking-wide">{b.label}</span>
+                </div>
+                {/* Tooltip line */}
+                <div className="absolute left-1/2 -bottom-5 -translate-x-1/2 text-[10px] text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                  {b.hint}
+                </div>
+              </motion.div>
+            )
+          })}
+        </motion.div>
       </div>
     </section>
   )
